@@ -4,13 +4,13 @@ var mouseDown = false, pageX = 0;
 
 function rotateScene(deltax)
 {
-    cubeGroup.rotation.y += deltax / 100;
-    $("#rotation").html("rotation: 0," + cubeGroup.rotation.y.toFixed(1) + ",0");
+    solarSystem.rotation.y += deltax / 100;
+    $("#rotation").html("rotation: 0," + solarSystem.rotation.y.toFixed(1) + ",0");
 }
 
 function scaleScene(scale)
 {
-    cubeGroup.scale.set(scale, scale, scale);
+    solarSystem.scale.set(scale, scale, scale);
     $("#scale").html("scale: " + scale);
 }
 

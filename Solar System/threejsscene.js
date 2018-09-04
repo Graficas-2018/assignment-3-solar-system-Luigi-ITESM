@@ -1,10 +1,10 @@
 var renderer = null, 
 scene = null, 
 camera = null,
-cube = null,
-sphereGroup = null,
-sphere = null,
-cone = null;
+solarSystem = null,
+earth = null,
+planet = null,
+moon = null;
 
 var duration = 5000; // ms
 var currentTime = Date.now();
@@ -22,13 +22,14 @@ function animate()
     var movement = now * 0.001;
 
     // Rotate the cube about its Y axis
-    sphere.rotation.y += angle;
+    //cube.rotation.y += angle;
 
     // Rotate the sphere group about its Y axis
-    //sphere.rotation.x += angle;
+    earth.rotation.y -= angle / 2;
+    planet.rotation.y += angle;
 
     // Rotate the cone about its X axis (tumble forward)
-    cone.rotation.z += angle;
+    moon.rotation.z += angle;
 }
 
 function run() {
@@ -62,7 +63,7 @@ function createScene(canvas)
     scene.add(camera);
 
     // Create a group to hold all the objects
-    sphereGroup = new THREE.Object3D;
+    solarSystem = new THREE.Object3D;
     
     // Add a directional light to show off the objects
     var light = new THREE.DirectionalLight( 0xffffff, 1.5);
@@ -71,36 +72,59 @@ function createScene(canvas)
     // Position the light out from the scene, pointing at the origin
     light.position.set(-.5, .2, 1);
     light.target.position.set(0,-2,0);
-    sphereGroup.add(light);
+    solarSystem.add(light);
 
-    var textureUrl = "../images/ash_uvgrid01.jpg";
+    var textureUrl = "../images/earth_atmos_2048.jpg";
     var texture = new THREE.TextureLoader().load(textureUrl);
     var material = new THREE.MeshPhongMaterial({ map: texture });
+
+    /*
+    // Create the cube geometry
+    var geometry = new THREE.CubeGeometry(2, 2, 2);
+
+    // And put the geometry and material together into a mesh
+    cube = new THREE.Mesh(geometry, material);
+
+    // Tilt the mesh toward the viewer
+    cube.rotation.x = Math.PI / 5;
+    cube.rotation.y = Math.PI / 5;
+
+    // Add the cube mesh to our group
+    cubeGroup.add( cube );*/
+
+    // Create a group for the sphere
+    earth = new THREE.Object3D;
+    solarSystem.add(earth);
+    
+    // Move the sphere group up and back from the cube
+    //earth.position.set(0, 3, -4);
 
     // Create the sphere geometry
     geometry = new THREE.SphereGeometry(1, 20, 20);
     
     // And put the geometry and material together into a mesh
-    sphere = new THREE.Mesh(geometry, material);
+    planet = new THREE.Mesh(geometry, material);
 
-    // Tilt the mesh toward the viewer
-    sphere.rotation.x = Math.PI / 5;
-    sphere.rotation.y = Math.PI / 5;
-
-    // Add the cube mesh to our group
-    sphereGroup.add( sphere );
-
-    // Create a group for the sphere
+    // Add the sphere mesh to our group
+    earth.add( planet );
 
     // Create the cone geometry
-    geometry = new THREE.CylinderGeometry(0, .333, .444, 20, 5);
+    geometry = new THREE.SphereGeometry(0.2, 20, 20)
+
+    // Add a different texture to the moon
+    textureUrl = "../images/moon_1024.jpg";
+    texture = new THREE.TextureLoader().load(textureUrl);
+    material = new THREE.MeshPhongMaterial({ map: texture });
 
     // And put the geometry and material together into a mesh
-    cone = new THREE.Mesh(geometry, material);
+    moon = new THREE.Mesh(geometry, material);
 
     // Move the cone up and out from the sphere
-    cone.position.set(1, 1, -.667);
+    moon.position.set(1, 1, -.667);
+        
+    // Add the cone mesh to our group
+    earth.add( moon );
     
     // Now add the group to our scene
-    scene.add( sphereGroup );
+    scene.add( solarSystem );
 }
