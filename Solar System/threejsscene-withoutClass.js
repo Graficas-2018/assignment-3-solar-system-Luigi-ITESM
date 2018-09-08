@@ -1,95 +1,3 @@
-class Planeta {
-  constructor(textureUrl, nLuna, position, scale, bumpUrl, normalUrl) {
-    this.textureUrl = textureUrl;
-    this.nLuna = nLuna;
-    this.position = position;
-    this.scale = scale;
-    this.bumpUrl = bumpUrl;
-    this.normalUrl = normalUrl;
-  }
-
-  getObject() {
-    if (this.scale == null)
-        this.scale = 1;
-
-    // Object containing planet and moons
-    let earth = new THREE.Object3D;
-
-    let texture = new THREE.TextureLoader().load(this.textureUrl);
-
-    let material = null;
-
-    if (this.bumpUrl != null) {
-        var bump = new THREE.TextureLoader().load(this.bumpUrl);
-        material = new THREE.MeshPhongMaterial({ map: texture, bumpMap: bump, bumpScale: 0.06 });
-    } else {
-        if (this.normalUrl != null) {
-            var normal = new THREE.TextureLoader().load(this.normalUrl);
-            material = new THREE.MeshPhongMaterial({ map: texture, normalMap: normal });
-        } else
-            material = new THREE.MeshPhongMaterial({ map: texture });
-    }
-
-    // Create the sphere geometry
-    let geometry = new THREE.SphereGeometry(this.scale, 20, 20);
-    
-    // And put the geometry and material together into a mesh
-    let planet = new THREE.Mesh(geometry, material);
-
-    // Add the sphere mesh to our group
-    earth.add( planet );
-
-    /*
-
-    // Create the cone geometry
-    geometry = new THREE.SphereGeometry(0.2, 20, 20)
-
-    // Add a different texture to the moon
-    textureUrl = "../images/moon_1024.jpg";
-    texture = new THREE.TextureLoader().load(textureUrl);
-    material = new THREE.MeshPhongMaterial({ map: texture });
-
-    // And put the geometry and material together into a mesh
-    moon = new THREE.Mesh(geometry, material);
-
-    // Move the cone up and out from the sphere
-    moon.position.set(1, 1, -.667);*/
-
-    //moon = new Luna(1, 1, -.667);
-    //console.log(moon);
-        
-    // Add the cone mesh to our group
-    for (var n = 0; n < this.nLuna; n++)  {
-        var vec3 = new THREE.Vector3( 1, 1, -.667 );
-        moon = new Luna(vec3, scale);
-        //console.log(moon);
-        earth.add(moon);
-    }
-
-    earth.position.set(this.position.x, this.position.y, this.position.z);
-
-    return earth;
-  }
-
-  rotateAndTranslate(basePosition, angle, days, angleTras) {
-    let obj = this.getObject();
-    obj.rotation.y += angle / 2;
-
-    let velocity = 365 / (days * 10);
-
-    // Algo así
-    
-    obj.position.x = Math.cos(angleTras * velocity * Math.PI / 180) * basePosition;
-    obj.position.z = Math.sin(angleTras * velocity * Math.PI / 180) * basePosition ;
-
-    //console.log(obj.position.x + " " + obj.position.z + " ", angleTras);
-    //console.log(angleTras);
-    console.log(obj.position.x);
-    }
-
-  // ...
-}
-
 var renderer = null, 
 scene = null, 
 camera = null,
@@ -125,14 +33,12 @@ function animate()
     // Rotate the cone about its X axis (tumble forward)
     moon.rotation.z += angle;*/
     // Días que dura el año
-    //sun.rotation.y += angle / 2;
-    //rotateAndTranslate(mercurio, 2, angle, 88);
-    mercurio.rotateAndTranslate(2, angle, 88, angleTras);
-    //rotateAndTranslate(venus, 4, angle, 225);
-    //rotateAndTranslate(tierra, 6, angle, 365);
-    //rotateAndTranslate(marte, 8, angle, 687);
+    sun.rotation.y += angle / 2;
+    rotateAndTranslate(mercurio, 2, angle, 88);
+    rotateAndTranslate(venus, 4, angle, 225);
+    rotateAndTranslate(tierra, 6, angle, 365);
+    rotateAndTranslate(marte, 8, angle, 687);
 
-    angleTras++;
 }
 
 function rotateAndTranslate(obj, basePosition, angle, days) {
@@ -161,7 +67,69 @@ function run() {
         animate();
 }
 
+function Planeta(textureUrl, nLuna, position, scale, bumpUrl, normalUrl) {
 
+    if (scale == null)
+        scale = 1;
+
+    // Object containing planet and moons
+    var earth = new THREE.Object3D;
+
+    var texture = new THREE.TextureLoader().load(textureUrl);
+
+    var material = null;
+
+    if (bumpUrl != null) {
+        var bump = new THREE.TextureLoader().load(bumpUrl);
+        material = new THREE.MeshPhongMaterial({ map: texture, bumpMap: bump, bumpScale: 0.06 });
+    } else {
+        if (normalUrl != null) {
+            var normal = new THREE.TextureLoader().load(normalUrl);
+            material = new THREE.MeshPhongMaterial({ map: texture, normalMap: normal });
+        } else
+            material = new THREE.MeshPhongMaterial({ map: texture });
+    }
+
+    // Create the sphere geometry
+    geometry = new THREE.SphereGeometry(scale, 20, 20);
+    
+    // And put the geometry and material together into a mesh
+    planet = new THREE.Mesh(geometry, material);
+
+    // Add the sphere mesh to our group
+    earth.add( planet );
+
+    /*
+
+    // Create the cone geometry
+    geometry = new THREE.SphereGeometry(0.2, 20, 20)
+
+    // Add a different texture to the moon
+    textureUrl = "../images/moon_1024.jpg";
+    texture = new THREE.TextureLoader().load(textureUrl);
+    material = new THREE.MeshPhongMaterial({ map: texture });
+
+    // And put the geometry and material together into a mesh
+    moon = new THREE.Mesh(geometry, material);
+
+    // Move the cone up and out from the sphere
+    moon.position.set(1, 1, -.667);*/
+
+    //moon = new Luna(1, 1, -.667);
+    //console.log(moon);
+        
+    // Add the cone mesh to our group
+    for (var n = 0; n < nLuna; n++)  {
+        var vec3 = new THREE.Vector3( 1, 1, -.667 );
+        moon = new Luna(vec3, scale);
+        //console.log(moon);
+        earth.add(moon);
+    }
+
+    earth.position.set(position.x, position.y, position.z);
+
+    return earth;
+}
 
 function Luna(pos, scale) {
     // Create the cone geometry
@@ -287,7 +255,7 @@ function createScene(canvas)
     sun = new Planeta("../images/sunmap.jpg", 0, new THREE.Vector3());
 
     // Mercury: 38% Earth size
-    mercurio = new Planeta("../images/mercurymap.jpg", 0, new THREE.Vector3(2, 0, 0), 0.5 * 0.38, "../images/mercurybump.jpg");
+    mercurio = new Planeta("../images/mercurymap.jpg", 0, new THREE.Vector3(2, 0, 0), 0.5 * 0.38, "../images/mercurybump");
 
     // 95% Earth size
     venus =  new Planeta("../images/venusmap.jpg", 0, new THREE.Vector3(4, 0, 0), 0.5 * 0.95, "../images/venusbump.jpg");
@@ -295,21 +263,21 @@ function createScene(canvas)
     tierra = new Planeta("../images/earth_atmos_2048.jpg", 1, new THREE.Vector3(6, 0, 0), 0.5);
 
     // Mars: 55% Earth size
-    marte = new Planeta("../images/marsmap.jpg", 0, new THREE.Vector3(8, 0, 0), 0.5 * 0.55, null, "../images/marsnormal.jpg");
+    marte = new Planeta("../images/marsmap.jpg", 0, new THREE.Vector3(8, 0, 0), 0.5 * 0.55, null, "../images/venusnormal.jpg");
 
     //sun.add(light);
 
-    solarSystem.add(sun.getObject());
-    solarSystem.add(mercurio.getObject());
+    solarSystem.add(sun);
+    solarSystem.add(mercurio);
     solarSystem.add(createOrbit(mercurio.position.x));
 
-    solarSystem.add(venus.getObject());
+    solarSystem.add(venus);
     solarSystem.add(createOrbit(venus.position.x));
 
-    solarSystem.add(tierra.getObject());
+    solarSystem.add(tierra);
     solarSystem.add(createOrbit(tierra.position.x));
 
-    solarSystem.add(marte.getObject());
+    solarSystem.add(marte);
     solarSystem.add(createOrbit(marte.position.x));
 
     scene.add( solarSystem );
