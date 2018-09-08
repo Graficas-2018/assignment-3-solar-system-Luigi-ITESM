@@ -6,14 +6,12 @@ class Planeta {
     this.scale = scale;
     this.bumpUrl = bumpUrl;
     this.normalUrl = normalUrl;
-  }
 
-  getObject() {
     if (this.scale == null)
         this.scale = 1;
 
     // Object containing planet and moons
-    let earth = new THREE.Object3D;
+    this.earth = new THREE.Object3D;
 
     let texture = new THREE.TextureLoader().load(this.textureUrl);
 
@@ -37,7 +35,7 @@ class Planeta {
     let planet = new THREE.Mesh(geometry, material);
 
     // Add the sphere mesh to our group
-    earth.add( planet );
+    this.earth.add( planet );
 
     /*
 
@@ -63,16 +61,19 @@ class Planeta {
         var vec3 = new THREE.Vector3( 1, 1, -.667 );
         moon = new Luna(vec3, scale);
         //console.log(moon);
-        earth.add(moon);
+        this.earth.add(moon);
     }
 
-    earth.position.set(this.position.x, this.position.y, this.position.z);
+    this.earth.position.set(this.position.x, this.position.y, this.position.z);
+  }
 
-    return earth;
+  getObject() {
+    //console.log(this.earth);
+    return this.earth;
   }
 
   rotateAndTranslate(basePosition, angle, days, angleTras) {
-    let obj = this.getObject();
+    let obj = this.earth;
     obj.rotation.y += angle / 2;
 
     let velocity = 365 / (days * 10);
@@ -128,6 +129,9 @@ function animate()
     //sun.rotation.y += angle / 2;
     //rotateAndTranslate(mercurio, 2, angle, 88);
     mercurio.rotateAndTranslate(2, angle, 88, angleTras);
+    venus.rotateAndTranslate(4, angle, 225, angleTras);
+    tierra.rotateAndTranslate(6, angle, 365, angleTras);
+    marte.rotateAndTranslate(8, angle, 687, angleTras);
     //rotateAndTranslate(venus, 4, angle, 225);
     //rotateAndTranslate(tierra, 6, angle, 365);
     //rotateAndTranslate(marte, 8, angle, 687);
