@@ -6,6 +6,7 @@ class Planeta {
     this.scale = scale;
     this.bumpUrl = bumpUrl;
     this.normalUrl = normalUrl;
+    this.moons = new Array();
 
     if (this.scale == null)
         this.scale = 1;
@@ -60,8 +61,9 @@ class Planeta {
     for (var n = 0; n < this.nLuna; n++)  {
         var vec3 = new THREE.Vector3( 1, 1, -.667 );
         moon = new Luna(vec3, scale);
+        this.moons.push(moon);
         //console.log(moon);
-        this.earth.add(moon);
+        this.earth.add(moon.getObject());
     }
 
     this.earth.position.set(this.position.x, this.position.y, this.position.z);
@@ -85,10 +87,45 @@ class Planeta {
 
     //console.log(obj.position.x + " " + obj.position.z + " ", angleTras);
     //console.log(angleTras);
-    console.log(obj.position.x);
+    //console.log(obj.position.x);
+    this.rotateMoons(angle);
+    }
+
+
+    rotateMoons(angle) {
+        //console.log(this.moons.length);
+        for (var i = 0; i < this.moons.length; i++) {
+            this.moons[i].getObject().rotation.z += angle;
+            this.moons[i].getObject().rotation.y += angle / 4;
+
+            console.log(this.moons[i].getObject().rotation.z);
+        }
     }
 
   // ...
+}
+
+class Luna {
+    constructor(pos, scale){
+        this.pos = pos;
+        this.scale = scale;
+        let geometry = new THREE.SphereGeometry(0.2 * scale, 20, 20);
+        let textureUrl = "../images/moon_1024.jpg";
+        let texture = new THREE.TextureLoader().load(textureUrl);
+        let material = new THREE.MeshPhongMaterial({ map: texture });
+
+        // And put the geometry and material together into a mesh
+        this.moon = new THREE.Mesh(geometry, material);
+
+        // Move the cone up and out from the sphere
+        //console.log(pos);
+        this.moon.position.set(this.pos.x * this.scale, this.pos.y * this.scale, this.pos.z * this.scale);
+
+    }
+
+    getObject(){
+        return this.moon;
+    }
 }
 
 var renderer = null, 
@@ -163,25 +200,6 @@ function run() {
         // Spin the cube for next frame
         //planeta.animate();
         animate();
-}
-
-
-
-function Luna(pos, scale) {
-    // Create the cone geometry
-    geometry = new THREE.SphereGeometry(0.2 * scale, 20, 20);
-    textureUrl = "../images/moon_1024.jpg";
-    texture = new THREE.TextureLoader().load(textureUrl);
-    material = new THREE.MeshPhongMaterial({ map: texture });
-
-    // And put the geometry and material together into a mesh
-    var moon = new THREE.Mesh(geometry, material);
-
-    // Move the cone up and out from the sphere
-    console.log(pos);
-    moon.position.set(pos.x * scale, pos.y * scale, pos.z * scale);
-
-    return moon;
 }
 
 function createOrbit(radius)  {
