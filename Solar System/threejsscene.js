@@ -128,6 +128,28 @@ class Luna {
     }
 }
 
+class Asteroid {
+    constructor(pos, scale) {
+        this.pos = pos;
+        this.scale = scale;
+
+        let mtLoader = new THREE.MTLLoader();
+        mtLoader.load("../models/10464_Asteroid_v1_Iterations-2.mtl", function(material) {
+            material.preload();
+            let objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(material);
+
+            objLoader.load("../models/10464_Asteroid_v1_Iterations-2.obj", function(object) {
+                this.asteroid = object;
+            });
+        });
+    }
+
+    getObject() {
+        return this.asteroid;
+    }
+}
+
 var renderer = null, 
 scene = null, 
 camera = null,
@@ -321,6 +343,9 @@ function createScene(canvas)
 
     //sun.add(light);
 
+    // Asteroid
+    var asteroide = new Asteroid(new THREE.Vector3(10, 0, 0), 0.5 * 0.55);
+
     solarSystem.add(sun.getObject());
     solarSystem.add(mercurio.getObject());
     solarSystem.add(createOrbit(mercurio.position.x));
@@ -333,6 +358,8 @@ function createScene(canvas)
 
     solarSystem.add(marte.getObject());
     solarSystem.add(createOrbit(marte.position.x));
+
+    solarSystem.add(asteroide);
 
     scene.add( solarSystem );
 } 
