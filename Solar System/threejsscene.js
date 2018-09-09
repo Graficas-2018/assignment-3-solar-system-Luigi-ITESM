@@ -98,7 +98,7 @@ class Planeta {
             this.moons[i].getObject().rotation.z += angle;
             this.moons[i].getObject().rotation.y += angle / 4;
 
-            console.log(this.moons[i].getObject().rotation.z);
+            //sconsole.log(this.moons[i].getObject().rotation.z);
         }
     }
 
