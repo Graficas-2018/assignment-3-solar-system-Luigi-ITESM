@@ -133,14 +133,18 @@ class Asteroid {
         this.pos = pos;
         this.scale = scale;
 
-        let mtLoader = new THREE.MTLLoader();
-        mtLoader.load("../models/10464_Asteroid_v1_Iterations-2.mtl", function(material) {
-            material.preload();
-            let objLoader = new THREE.OBJLoader();
-            objLoader.setMaterials(material);
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setPath("../models/");
+        mtlLoader.load("10464_Asteroid_v1_Iterations-2.mtl", function(materials) {
+            materials.preload();
 
+            var objLoader = new THREE.OBJLoader();
+            objLoader.setMaterials(materials);
             objLoader.load("../models/10464_Asteroid_v1_Iterations-2.obj", function(object) {
-                this.asteroid = object;
+                object.position.x -= 10;
+                object.scale.set(4, 4, 4);
+                console.log(object.scale);
+                solarSystem.add(object);
             });
         });
     }
@@ -345,6 +349,7 @@ function createScene(canvas)
 
     // Asteroid
     var asteroide = new Asteroid(new THREE.Vector3(10, 0, 0), 0.5 * 0.55);
+    //setTimeout(function(){alert("stop")}, 1000);
 
     solarSystem.add(sun.getObject());
     solarSystem.add(mercurio.getObject());
@@ -359,7 +364,7 @@ function createScene(canvas)
     solarSystem.add(marte.getObject());
     solarSystem.add(createOrbit(marte.position.x));
 
-    solarSystem.add(asteroide);
+    //solarSystem.add(asteroide.getObject());
 
     scene.add( solarSystem );
 } 
