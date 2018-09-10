@@ -243,7 +243,7 @@ function animate()
     // Rotate the cone about its X axis (tumble forward)
     moon.rotation.z += angle;*/
     // Días que dura el año
-    sun.getObject().rotation.y += angle / 2;
+    sun.rotation.y += angle / 2;
     //rotateAndTranslate(mercurio, 2, angle, 88);
     mercurio.rotateAndTranslate(mercurio.position.x, angle, 88, angleTras);
     venus.rotateAndTranslate(venus.position.x, angle, 225, angleTras);
@@ -380,20 +380,17 @@ function createScene(canvas)
     //light.target.position.set(0,-2,0);
     solarSystem.add(light);
 
-    var spotLight = new THREE.SpotLight(0xffffff, 1);
-    spotLight.position.set(0, 3, 0);
-    spotLight.target.position.set(0, 0, 0);
-
-    solarSystem.add(spotLight);
-
-    var spotLight2 = spotLight.clone();
-    spotLight2.position.set(0, -3, 0);
-    solarSystem.add(spotLight2);
-
-
-    var textureUrl = "../images/earth_atmos_2048.jpg";
+    var textureUrl = "../images/sunmap.jpg";
     var texture = new THREE.TextureLoader().load(textureUrl);
-    var material = new THREE.MeshPhongMaterial({ map: texture, bumpMap: "../images/moon_bump.jpg", bumpScale: 0.06 });
+    var material = new THREE.MeshBasicMaterial({ map: texture});
+
+    var geometry = new THREE.SphereGeometry(1, 20, 20);
+    
+    // And put the geometry and material together into a mesh
+    sun = new THREE.Mesh(geometry, material);
+
+    // Add the sphere mesh to our group
+    solarSystem.add( sun );
 
     /*
     // Create the cube geometry
@@ -445,7 +442,7 @@ function createScene(canvas)
     earth.add( moon );*/
     
     // Now add the group to our scene
-    sun = new Planeta("../images/sunmap.jpg", 0, new THREE.Vector3());
+    //sun = new Planeta("../images/sunmap.jpg", 0, new THREE.Vector3());
 
     // Mercury: 38% Earth size
     mercurio = new Planeta("../images/mercurymap.jpg", 0, new THREE.Vector3(2, 0, 0), 0.5 * 0.38, "../images/mercurybump.jpg");
@@ -480,7 +477,7 @@ function createScene(canvas)
     //var asteroide = new Asteroid(new THREE.Vector3(10, 0, 0), 0.5 * 0.55);
     //setTimeout(function(){alert("stop")}, 1000);
 
-    solarSystem.add(sun.getObject());
+    //solarSystem.add(sun.getObject());
     solarSystem.add(mercurio.getObject());
     solarSystem.add(createOrbit(mercurio.position.x));
 
