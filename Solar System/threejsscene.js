@@ -110,7 +110,7 @@ class Planeta {
     let obj = this.earth;
     obj.rotation.y += angle / 2;
 
-    let velocity = 365 / (days * 10);
+    let velocity = 365 / (days * 3);
 
     // Algo así
     
