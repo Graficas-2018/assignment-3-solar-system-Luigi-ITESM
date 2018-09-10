@@ -372,13 +372,24 @@ function createScene(canvas)
     asteroidBelt = new THREE.Object3D;
     
     // Add a directional light to show off the objects
-    //var light = new THREE.PointLight( 0xffffff, 5, 0);
-    var light = new THREE.DirectionalLight( 0xffffff, 1.5);
+    var light = new THREE.PointLight( 0xffffff, 2.5, 10);
+    //var light = new THREE.DirectionalLight( 0xffffff, 1.5);
 
     // Position the light out from the scene, pointing at the origin
     //light.position.set(0, 0, 0);
-    light.target.position.set(0,-2,0);
+    //light.target.position.set(0,-2,0);
     solarSystem.add(light);
+
+    var spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.position.set(0, 3, 0);
+    spotLight.target.position.set(0, 0, 0);
+
+    solarSystem.add(spotLight);
+
+    var spotLight2 = spotLight.clone();
+    spotLight2.position.set(0, -3, 0);
+    solarSystem.add(spotLight2);
+
 
     var textureUrl = "../images/earth_atmos_2048.jpg";
     var texture = new THREE.TextureLoader().load(textureUrl);
