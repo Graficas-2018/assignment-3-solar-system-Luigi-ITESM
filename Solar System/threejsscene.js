@@ -141,10 +141,31 @@ class Asteroid {
             var objLoader = new THREE.OBJLoader();
             objLoader.setMaterials(materials);
             objLoader.load("../models/10464_Asteroid_v1_Iterations-2.obj", function(object) {
-                object.position.x -= 10;
-                object.scale.set(4, 4, 4);
-                console.log(object.scale);
-                solarSystem.add(object);
+                object.position.x = pos.x;
+                object.position.z = pos.z;
+                //console.log(pos.x + ',' + pos.z );
+                object.scale.set(scale, scale, scale);
+                console.log(object.position.x + ',' + object.position.z);
+                asteroidBelt.add(object);
+                //console.log(asteroidBelt.position);
+                //this.asteroid = object;
+                let n = 0;
+                let asteroid = null, posX = 0, posY = 0, randomAngle = 0;
+
+                let location = 0;
+
+                while (n < 100) {
+                    randomAngle = Math.floor(Math.random() * 360);
+                    location = Math.random() + 8.7;
+                    asteroid = object.clone();
+                    asteroid.position.x = Math.cos(randomAngle * Math.PI / 180) * location;
+                    asteroid.position.z = Math.sin(randomAngle * Math.PI / 180) * location;
+                    console.log("Angle: " + randomAngle + " " + asteroid.position.x + "," + asteroid.position.z);
+                    asteroidBelt.add(asteroid);
+                    n++;
+                }
+                //asteroidBelt.position.x += 0.5;
+                //asteroidBelt.position.z -= 1.5;
             });
         });
     }
@@ -158,9 +179,10 @@ var renderer = null,
 scene = null, 
 camera = null,
 solarSystem = null,
+asteroidBelt = null,
 earth = null,
 planet = null,
-moon = null, tierra = null, sun = null, venus = null, mercurio = null, marte = null;
+moon = null, tierra = null, sun = null, venus = null, mercurio = null, marte = null, jupiter = null;
 
 var angleTras = 0;
 
@@ -189,12 +211,17 @@ function animate()
     // Rotate the cone about its X axis (tumble forward)
     moon.rotation.z += angle;*/
     // Días que dura el año
-    //sun.rotation.y += angle / 2;
+    sun.getObject().rotation.y += angle / 2;
     //rotateAndTranslate(mercurio, 2, angle, 88);
-    mercurio.rotateAndTranslate(2, angle, 88, angleTras);
-    venus.rotateAndTranslate(4, angle, 225, angleTras);
-    tierra.rotateAndTranslate(6, angle, 365, angleTras);
-    marte.rotateAndTranslate(8, angle, 687, angleTras);
+    mercurio.rotateAndTranslate(mercurio.position.x, angle, 88, angleTras);
+    venus.rotateAndTranslate(venus.position.x, angle, 225, angleTras);
+    tierra.rotateAndTranslate(tierra.position.x, angle, 365, angleTras);
+    marte.rotateAndTranslate(marte.position.x, angle, 687, angleTras);
+
+    // 12 años en moverse
+    jupiter.rotateAndTranslate(jupiter.position.x, angle, 12 * 365, angleTras);
+
+    asteroidBelt.rotation.y += angle / 64;
     //rotateAndTranslate(venus, 4, angle, 225);
     //rotateAndTranslate(tierra, 6, angle, 365);
     //rotateAndTranslate(marte, 8, angle, 687);
@@ -246,6 +273,32 @@ function createOrbit(radius)  {
     return orbit;
 }
 
+function createAsteroidBelt() {
+    for (var createAngle = 0; createAngle < 360; createAngle++)
+        console.log('Angulo:' + createAngle + ': ' + Math.cos(createAngle * Math.PI / 180) * 8 + ',' + ',' + Math.sin(createAngle * Math.PI / 180) * 8);
+
+    createAngle = Math.floor(Math.random() * 360);
+    let location = Math.random() + 8.7;
+    //console.log(createAngle);
+    let asteroidBelt = new Asteroid(new THREE.Vector3(Math.cos(createAngle * Math.PI / 180) * location, 0, Math.sin(createAngle * Math.PI / 180) * location), 1);
+
+    /*for (var n = 0; n < 1000; n++) {
+        asteroid = asteroidBelt.children[0];
+        createAngle = Math.floor(Math.random() * 360);
+        if (createAngle % 2 == 0) {
+            asteroid.position.x = Math.cos(createAngle) / 2 + 8;
+            asteroid.position.z = Math.sin(createAngle) / 2 + 8;
+        }
+        else {
+            asteroid.position.x = Math.cos(createAngle) / 2 - 8;
+            asteroid.position.z = Math.sin(createAngle) / 2 - 8;
+        }
+
+        asteroidBelt.add(asteroid);
+    }*/
+
+}
+
 function createScene(canvas)
 {    
     // Create the Three.js renderer and attach it to our canvas
@@ -258,7 +311,8 @@ function createScene(canvas)
     scene = new THREE.Scene();
 
     // Set the background color 
-    scene.background = new THREE.Color( 0.2, 0.2, 0.2 );
+    //scene.background = new THREE.Color( 0.2, 0.2, 0.2 );
+    scene.background = new THREE.TextureLoader().load("../images/space.jpg");
     // scene.background = new THREE.Color( "rgb(100, 100, 100)" );
 
     // Add  a camera so we can view the scene
@@ -268,6 +322,10 @@ function createScene(canvas)
 
     // Create a group to hold all the objects
     solarSystem = new THREE.Object3D;
+    
+
+    // Create Asteroid Belt
+    asteroidBelt = new THREE.Object3D;
     
     // Add a directional light to show off the objects
     //var light = new THREE.PointLight( 0xffffff, 5, 0);
@@ -345,10 +403,13 @@ function createScene(canvas)
     // Mars: 55% Earth size
     marte = new Planeta("../images/marsmap.jpg", 0, new THREE.Vector3(8, 0, 0), 0.5 * 0.55, null, "../images/marsnormal.jpg");
 
+    // Jupiter: 1120% Earth size
+    jupiter = new Planeta("../images/jupitermap.jpg", 0, new THREE.Vector3(11, 0, 0), 0.5 * 2.5);
+
     //sun.add(light);
 
     // Asteroid
-    var asteroide = new Asteroid(new THREE.Vector3(10, 0, 0), 0.5 * 0.55);
+    //var asteroide = new Asteroid(new THREE.Vector3(10, 0, 0), 0.5 * 0.55);
     //setTimeout(function(){alert("stop")}, 1000);
 
     solarSystem.add(sun.getObject());
@@ -364,7 +425,13 @@ function createScene(canvas)
     solarSystem.add(marte.getObject());
     solarSystem.add(createOrbit(marte.position.x));
 
+    solarSystem.add(jupiter.getObject());
+    solarSystem.add(createOrbit(jupiter.position.x));
+
     //solarSystem.add(asteroide.getObject());
+    // Add Asteroid Belt
+    createAsteroidBelt();
+    solarSystem.add(asteroidBelt);
 
     scene.add( solarSystem );
 } 
