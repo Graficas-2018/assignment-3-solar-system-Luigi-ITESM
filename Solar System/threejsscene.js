@@ -1,11 +1,12 @@
 class Planeta {
-  constructor(textureUrl, nLuna, position, scale, bumpUrl, normalUrl) {
+  constructor(textureUrl, nLuna, position, scale, bumpUrl, normalUrl, ringUrl, rotateRing) {
     this.textureUrl = textureUrl;
     this.nLuna = nLuna;
     this.position = position;
     this.scale = scale;
     this.bumpUrl = bumpUrl;
     this.normalUrl = normalUrl;
+    this.ringUrl = ringUrl;
     this.moons = new Array();
 
     if (this.scale == null)
@@ -38,6 +39,30 @@ class Planeta {
     // Add the sphere mesh to our group
     this.earth.add( planet );
 
+    if (ringUrl != null) {
+        geometry = new THREE.TorusGeometry( this.scale + 0.25, 0.1, 2, 200 );
+        let ring = new THREE.TextureLoader().load(this.ringUrl);
+        material = new THREE.MeshBasicMaterial( { map: ring } );
+        let torus = new THREE.Mesh( geometry, material );
+
+        switch (rotateRing) {
+            case "x":
+                torus.rotation.x = Math.PI / 2;
+                break;
+
+            case "y":
+                torus.rotation.y = Math.PI / 2;
+                break;
+
+            case "z":
+                torus.rotation.z = Math.PI / 2;
+                break;
+        }
+        
+        this.ring = torus;
+        this.earth.add( this.ring );
+    }
+
     /*
 
     // Create the cone geometry
@@ -58,8 +83,15 @@ class Planeta {
     //console.log(moon);
         
     // Add the cone mesh to our group
+    let newMoonPosX = 1;
+    let newMoonPosY = 1;
     for (var n = 0; n < this.nLuna; n++)  {
-        var vec3 = new THREE.Vector3( 1, 1, -.667 );
+        console.log("Create moon: " + n);
+        if (n > 0) {
+            newMoonPosX = Math.random() * 2 - 1;
+            newMoonPosY = Math.random() * 2 - 1;
+        }
+        var vec3 = new THREE.Vector3( newMoonPosX, newMoonPosY, -.667 );
         moon = new Luna(vec3, scale);
         this.moons.push(moon);
         //console.log(moon);
@@ -182,7 +214,7 @@ solarSystem = null,
 asteroidBelt = null,
 earth = null,
 planet = null,
-moon = null, tierra = null, sun = null, venus = null, mercurio = null, marte = null, jupiter = null;
+moon = null, tierra = null, sun = null, venus = null, mercurio = null, marte = null, jupiter = null, saturno = null, urano = null, neptuno = null, pluton = null;
 
 var angleTras = 0;
 
@@ -220,6 +252,18 @@ function animate()
 
     // 12 años en moverse
     jupiter.rotateAndTranslate(jupiter.position.x, angle, 12 * 365, angleTras);
+
+    // 11000 días en moverse
+    saturno.rotateAndTranslate(saturno.position.x, angle, 11000, angleTras);
+
+    // 80 años en moverse
+    urano.rotateAndTranslate(urano.position.x, angle, 80 * 365, angleTras);
+
+    // 165 años en moverse
+    neptuno.rotateAndTranslate(neptuno.position.x, angle, 165 * 365, angleTras);
+
+    // 90400 días en moverse
+    pluton.rotateAndTranslate(pluton.position.x, angle, 90400, angleTras);
 
     asteroidBelt.rotation.y += angle / 64;
     //rotateAndTranslate(venus, 4, angle, 225);
@@ -401,10 +445,23 @@ function createScene(canvas)
     tierra = new Planeta("../images/earth_atmos_2048.jpg", 1, new THREE.Vector3(6, 0, 0), 0.5);
 
     // Mars: 55% Earth size
-    marte = new Planeta("../images/marsmap.jpg", 0, new THREE.Vector3(8, 0, 0), 0.5 * 0.55, null, "../images/marsnormal.jpg");
+    marte = new Planeta("../images/marsmap.jpg", 2, new THREE.Vector3(8, 0, 0), 0.5 * 0.55, null, "../images/marsnormal.jpg");
 
-    // Jupiter: 1120% Earth size
-    jupiter = new Planeta("../images/jupitermap.jpg", 0, new THREE.Vector3(11, 0, 0), 0.5 * 2.5);
+    // Jupiter: 1120% Earth size (change to 250%)
+    jupiter = new Planeta("../images/jupitermap.jpg", 10, new THREE.Vector3(11, 0, 0), 0.5 * 2.5);
+
+    // Saturn: 945% Earth size (change to 180%)
+    saturno = new Planeta("../images/saturnmap.jpg", 10, new THREE.Vector3(14, 0, 0), 0.5 * 1.8, null, null, "../images/saturnringmap.jpg", "x");
+
+    // Urano: 400% Earth size (change to 130%)
+    urano = new Planeta("../images/uranusmap.jpg", 10, new THREE.Vector3(17, 0, 0), 0.5 * 1.3, null, null, "../images/uranusringmap.jpg", "y");
+
+    // Neptuno: 388% Earth size (change to 120% so we can see it)
+    neptuno = new Planeta("../images/neptunemap.jpg", 10, new THREE.Vector3(20, 0, 0), 0.5 * 1.2);
+
+    // Plutón: 18% Earth Size (Will change to 30% so we can see it
+    pluton = new Planeta("../images/plutomap.jpg", 5, new THREE.Vector3(23, 0, 0), 0.5 * 0.3, "../images/plutobump.jpg");
+
 
     //sun.add(light);
 
@@ -427,6 +484,18 @@ function createScene(canvas)
 
     solarSystem.add(jupiter.getObject());
     solarSystem.add(createOrbit(jupiter.position.x));
+
+    solarSystem.add(saturno.getObject());
+    solarSystem.add(createOrbit(saturno.position.x));
+
+    solarSystem.add(urano.getObject());
+    solarSystem.add(createOrbit(urano.position.x));
+
+    solarSystem.add(neptuno.getObject());
+    solarSystem.add(createOrbit(neptuno.position.x));
+
+    solarSystem.add(pluton.getObject());
+    solarSystem.add(createOrbit(pluton.position.x));
 
     //solarSystem.add(asteroide.getObject());
     // Add Asteroid Belt
